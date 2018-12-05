@@ -3,17 +3,22 @@ import Cocoa
 let dataUrl = Bundle.main.url(forResource: "data", withExtension: "txt")
 let input = try! String(contentsOf: dataUrl!)
 
-//let components = input.split(separator: "\n")
-
 let components = input.components(separatedBy: .newlines)
 
 var freq = 0
+var freqSet: Set = [ freq ]
 
-for change in components {
-    print("looking at <\(change)>")
-    
-    if let value = Int(change) {
-        freq += value
+loopy:
+while true {
+    for change in components {
+        if let value = Int(change) {
+            freq += value
+            if freqSet.contains(freq) {
+                print("found it! <\(freq)>")
+                break loopy
+            }
+            freqSet.insert(freq)
+        }
     }
 }
 
