@@ -5,7 +5,7 @@ let input = try! String(contentsOf: dataUrl!)
 
 let lines = input.components(separatedBy: .newlines)
 
-func scoreOf(id: String) -> Int {
+func scoreOf(id: String) -> (two: Bool, three: Bool) {
     var chars: Dictionary<Character,Int> = [:]
     
     for ch in id {
@@ -23,11 +23,18 @@ func scoreOf(id: String) -> Int {
         }
     }
     
-    return (foundTwo ? 1 : 0) + (foundThree ? 1 : 0)
+    return (foundTwo, foundThree)
 }
 
-scoreOf(id:"ababab")
-//for boxId in lines {
-//    print("Box \(boxId) => \(scoreOf(id:boxId))")
-//}
+var twosFound = 0
+var threesFound = 0
+
+for boxId in lines {
+    let score = scoreOf(id:boxId)
+    if score.two { twosFound += 1 }
+    if score.three { threesFound += 1 }
+}
+
+//final score
+print("Checksum: \(twosFound * threesFound)")
 
