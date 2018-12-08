@@ -56,28 +56,30 @@ public class DutyRecord {
         } else {
             return nil
         }
-        
     }
-
 }
 
 public class Night {
     public var guardId: Int
     public var startTime: Date
     public var sleepEvents: [SleepEvent]
+    
+    private var dutyRecords: [DutyRecord]
 
-    init(id: Int, startTime: Date) {
-        self.guardId = 0
-        self.startTime = startTime
-//        if let lineId = Int(lineString.substring(with: match.range(withName:"guardId"))) {
-//            self.guardId = lineId
-//        } else {
-//            self.guardId = 0
-//        }
-//
+    init?(startingRecord: DutyRecord) {
+        guard startingRecord.recordType == .beginShift else { return nil }
+        
+        self.guardId = startingRecord.guardId!
+        self.startTime = startingRecord.date
+
+        self.dutyRecords = [ startingRecord ]
         self.sleepEvents = []
     }
 
+    public func appendRecord(_ record: DutyRecord) {
+        dutyRecords.append(record)
+    }
+    
     public var totalSleepTime: Int {
         return sleepEvents.reduce(0, { total, event in
             total + event.length
@@ -85,16 +87,21 @@ public class Night {
     }
 }
 
-var lastDutyRecord: DutyRecord? = nil
+var tonight: Night? = nil
+var nights: Array<Night> = []
 for line in getData(from:"sample") {
     print(line)
     if let dutyRecord = DutyRecord(fromString: line) {
-        lastDutyRecord = dutyRecord
-        
-        print("record for: \(dutyRecord.date) and guard \(String(describing:dutyRecord.guardId))")
-    } else {
-        
-        print("could not convert line")
+        if dutyRecord.recordType == .beginShift {
+            if let lastNight = tonight {
+                print("record for last night: \(lastNight)" )
+            }
+
+            tonight = Night(startingRecord:dutyRecord)
+            nights.append(tonight!)
+            
+        } else {
+            tonight?.appendRecord(dutyRecord)
+        }
     }
-    
 }
