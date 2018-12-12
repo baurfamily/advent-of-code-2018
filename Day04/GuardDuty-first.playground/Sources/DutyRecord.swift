@@ -39,7 +39,6 @@ public class DutyRecord {
         if let lineDate = formatter.date(from:lineString.substring(with: match.range(withName:"date"))) {
             self.date = lineDate
         } else {
-            print("can't convert date: \(lineString.substring(with: match.range(withName:"date")))")
             return nil
         }
         

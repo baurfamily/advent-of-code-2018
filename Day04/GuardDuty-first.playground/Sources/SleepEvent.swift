@@ -26,7 +26,16 @@ public class SleepEvent : CustomStringConvertible {
         } else {
             return "SleepEvent: ??-na"
         }
-        
+    }
+    
+    public var sleepRange: Array<Int> {
+        var returnArray = Array(repeating: 0, count: 60)
+        if let s = start, let e = end {
+            for min in stride(from: s, through: (e-1), by: 1) {
+                returnArray[min] = 1
+            }
+        }
+        return returnArray
     }
 }
 

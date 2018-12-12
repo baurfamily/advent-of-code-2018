@@ -3,25 +3,16 @@ import Cocoa
 var tonight: Night? = nil
 var nights: Array<Night> = []
 var guards: Dictionary<Int,Array<Night>> = [:]
-for line in getData(from:"sample").sorted() {
-    print(line)
+for line in getData(from:"data").sorted() {
     if let dutyRecord = DutyRecord(fromString: line) {
         if dutyRecord.recordType == .beginShift {
-            if let lastNight = tonight {
-                print("record for last night: \(lastNight)" )
-                print("total minutes asleep: \(lastNight.totalSleepTime)")
-                print("night: \(lastNight)")
-            }
-
             if let newNight = Night(startingRecord:dutyRecord) {
                 tonight = newNight
                 nights.append(newNight)
                 if var guardRecords = guards[newNight.guardId] {
-                    print("found new guard: \(newNight.guardId)")
                     guardRecords.append(newNight)
                     guards[newNight.guardId] = guardRecords
                 } else {
-                    print("appending to existing guard: \(newNight)")
                     guards[newNight.guardId] = [ newNight ]
                 }
             }
@@ -32,13 +23,40 @@ for line in getData(from:"sample").sorted() {
     }
 }
 
+var sleepiestGuardId = 0
+var maxSleep = 0
 for (guardId, nights) in guards {
-    print("Guard: \(guardId)")
-    for night in nights {
-        print("\t\(night)")
-    }
     let total = nights.reduce(0, { total, night in
         total + night.totalSleepTime
     })
-    print("total time asleep: \(total)")
+    if total > maxSleep {
+        maxSleep = total
+        sleepiestGuardId = guardId
+    }
 }
+
+print("Guard #\(sleepiestGuardId) slept for \(maxSleep) minutes")
+
+var sleepArray = Array(repeating: 0, count: 60)
+
+let tens = (0...59).map{ $0 / 10 }
+let ones = (0...59).map{ $0 % 10 }
+
+print(tens.map{String($0)}.joined())
+print(ones.map{String($0)}.joined())
+
+if let nights = guards[sleepiestGuardId] {
+    for night in nights {
+        print(night.sleepArray.map({ $0 == 0 ? "." : "#" }).joined())
+        for (min, val) in night.sleepArray.enumerated() {
+            sleepArray[min] = sleepArray[min] + val
+        }
+    }
+}
+
+print(sleepArray.map{String($0)}.joined())
+let max = sleepArray.max()
+let position = sleepArray.firstIndex(of: max!)
+print("\tthe guard sleep the most at minute: \(position)")
+
+print("solution: \(sleepiestGuardId * position!)")
