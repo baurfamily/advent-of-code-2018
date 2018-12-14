@@ -6,6 +6,8 @@ public func resolvePolarity(polymer: String) -> String {
     let end = editedPolymer.count
     var i = end-1
     while i > 0 {
+        guard i < editedPolymer.count else { i -= 1; continue }
+
         let index0 = editedPolymer.index(editedPolymer.startIndex, offsetBy: i)
         let index1 = editedPolymer.index(editedPolymer.startIndex, offsetBy: i-1)
         
@@ -18,7 +20,7 @@ public func resolvePolarity(polymer: String) -> String {
         editedPolymer.remove(at: index0)
         editedPolymer.remove(at: index1)
         
-        i -= 2
+        i -= 1
     }
     
     return editedPolymer
